@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>登录</title>
+    <style>
+        *{margin:0;padding:0;box-sizing: border-box}
+        body{
+            border:1px solid red;
+            min-height:100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .form-wrapper{
+            padding:20px;
+            border:1px solid grey;
+        }
+        .form-wrapper .row{
+            margin:10px 0;
+        }
+        .form-wrapper .row>label{
+            display: inline-block;
+            min-width:4em;
+        }
+    </style>
+</head>
+<body>
+<div class="form-wrapper">
+    <h1>登录</h1>
+    <form id="signInForm">
+        <div class="row">
+            <label>邮箱</label>
+            <input type="text" name="email">
+            <span class="error"></span>
+        </div>
+        <div class="row">
+            <label>密码</label>
+            <input type="password" name="password">
+            <span class="error"></span>
+        </div>
+        <div class="row">
+            <input type="submit" value="登录">
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    let $form = $('#signInForm')
+    $form.on('submit',(e) => {
+        e.preventDefault()
+        let hash = {}
+        let need = ['email','password']
+        need.forEach((name) => {
+            let value = $form.find(`[name=${name}]`).val()
+            hash[name] = value
+        })
+        //前端验证
+        $form.find('.error').each((index,span)=>{$(span).text('')})
+        if(hash['email'] === ''){
+            $form.find('[name="email"]').siblings('.error')
+                .text('填邮箱啊同学')
+            return
+        }
+
+        $.post('sign_in',hash)
+            .then((response)=>{
+                    window.location.href = '/'
+                },
+                (request)=>{
+                    alert('登录失败')
+                })
+    })
+</script>
+</body>
+</html>
