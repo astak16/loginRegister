@@ -27,24 +27,30 @@ let server = http.createServer(function (request, response) {
     if (path === '/') {     //首页路由
         let string = fs.readFileSync('./index.html', 'utf8');
         let cookies = '';
-        if (request.headers.cookie) {
+        if (request.headers.cookie) {   //遍历Cookie，通过 Cookie 查询数据库里用户的信息
             cookies = request.headers.cookie.split(';');     //用';'拆分字符串，如果有多个 Cookie，获取的 Cookie 格式是['email=1@qq.com;a=1@;b=2@']
         }
+        // console.log('cookies')
+        // console.log(cookies)
 
-        let hash = {};  //下面的操作之后，hash会变成{sign_in_email:'1@qq.com'}
+        let hash = {};  //下面的操作之后，没设置前 hash 会变成{sign_in_email:'1@qq.com'}，设置了 Session 后登录后 hash 变成了{sessionID：'随机数'}
         for (let i = 0; i < cookies.length; i++) {
             let parts = cookies[i].split('=');
             let key = parts[0];
             let value = parts[1];
             hash[key] = value;
+            console.log('hash首页for里面')
+            console.log(hash)
         }
+        console.log('hash首页for循环外面')
+        console.log(hash)
 
         //let email = hash.sign_in_email  //根据Cookie找到用户邮箱
         let mySession = sessions[hash.sessionID];
-        console.log('hash')
+        console.log('hash 首页Session')
         console.log(hash)
-        console.log('mySession')
-        console.log(mySession)
+        // console.log('mySession')
+        // console.log(mySession)
 
         let email;
         if (mySession) {
@@ -59,8 +65,8 @@ let server = http.createServer(function (request, response) {
         for (let i = 0; i < users.length; i++) {
             if (users[i].email === email) { //如果数据库里有用户登录的邮箱，就把对应的信息取出来
                 foundUser = users[i]; //得到的 foundUser 内容 {email:'1@qq.com',password:'1',password_confirmation:'1'}
-                console.log('foundUser');
-                console.log(foundUser);
+                // console.log('foundUser');
+                // console.log(foundUser);
                 break;
             }
         }
@@ -96,13 +102,15 @@ let server = http.createServer(function (request, response) {
             let hash = {};
             strings.forEach((string) => { //遍历 strings
                 let parts = string.split('=');    //拆分strings  parts = ['email','3%40qq.com'],['password','3'],['password_confirmation','3']
-                console.log('parts');
-                console.log(parts);
+                // console.log('parts');
+                // console.log(parts);
                 let key = parts[0];
                 let value = parts[1];
                 hash[key] = decodeURIComponent(value);   //等价于 hash['email'] = '3%40qq.com'，在http中 @ 是 %40，这里需要翻译一下
+                console.log('hash注册for循环里面');
+                console.log(hash)
             });
-            console.log('hash');
+            console.log('hash注册for循环外面');
             console.log(hash);   //这时候的 hash 就变成了我们想要的结果了 {email:'3@qq.com',password:'3',password_confirmation:'3'}
 
             //拿到 hash 之后，就可以获取里面的内容
@@ -110,7 +118,8 @@ let server = http.createServer(function (request, response) {
             // let email = hash.email
             // let password = hash.password
             // let password_confirmation = hash.password_confirmation
-
+            console.log('hash注册for获取内容');
+            console.log(hash);
             //验证用户填写的信息格式是否正确
             if (email.indexOf('@') === -1) {
                 response.statusCode = 400;
@@ -175,10 +184,12 @@ let server = http.createServer(function (request, response) {
                 let key = parts[0];
                 let value = parts[1];
                 hash[key] = decodeURIComponent(value);
+                console.log('hash登录for循环里面');
+                console.log(hash);
             });
 
             let {email, password} = hash;
-            console.log('hash111111111111111111')
+            console.log('hash登录for循环外面')
             console.log(hash)
             //上面的代码同注册的一样
 
@@ -203,17 +214,17 @@ let server = http.createServer(function (request, response) {
 
                 let sessionID = Math.random() * 100000;
                 sessions[sessionID] = {sign_in_email: email};
-                console.log('sessions')
-                console.log(sessions)
+                // console.log('sessions')
+                // console.log(sessions)
 
 
                 var aaaa = `sessionID=${sessionID}`
-                console.log(`aaaa`)
-                console.log(aaaa)
+                // console.log(`aaaa`)
+                // console.log(aaaa)
                 response.setHeader('Set-Cookie', aaaa);
 
                 //设置Cookie，用户登录成功发放Cookie，发送请求的时候，都会带上Cookie，Cookie用户可以自己修改
-                //response.setHeader('Set-Cookie', `sign_in_email=${email};HttpOnly`);//设置 HttpOnly，用户无法通过 js 修改，但无法手动修改
+                //response.setHeader('Set-Cookie', `sign_in_email=${email};HttpOnly`);      //设置 HttpOnly，用户无法通过 js 修改，但无法手动修改
 
                 response.statusCode = 200;
             } else {
