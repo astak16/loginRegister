@@ -7,25 +7,33 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>登录</title>
     <style>
-        *{margin:0;padding:0;box-sizing: border-box}
-        body{
-            border:1px solid red;
-            min-height:100vh;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            border: 1px solid red;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
-        .form-wrapper{
-            padding:20px;
-            border:1px solid grey;
+
+        .form-wrapper {
+            padding: 20px;
+            border: 1px solid grey;
         }
-        .form-wrapper .row{
-            margin:10px 0;
+
+        .form-wrapper .row {
+            margin: 10px 0;
         }
-        .form-wrapper .row>label{
+
+        .form-wrapper .row > label {
             display: inline-block;
-            min-width:4em;
+            min-width: 4em;
         }
     </style>
 </head>
@@ -51,29 +59,32 @@
 
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script>
-    let $form = $('#signInForm')
-    $form.on('submit',(e) => {
-        e.preventDefault()
-        let hash = {}
-        let need = ['email','password']
+    let $form = $('#signInForm');
+    $form.on('submit', (e) => {
+        e.preventDefault();
+        let hash = {};
+        let need = ['email', 'password'];
         need.forEach((name) => {
-            let value = $form.find(`[name=${name}]`).val()
-            hash[name] = value
+            let value = $form.find(`[name=${name}]`).val();
+            hash[name] = value;
         })
+
         //前端验证
-        $form.find('.error').each((index,span)=>{$(span).text('')})
-        if(hash['email'] === ''){
+        $form.find('.error').each((index, span) => {
+            $(span).text('');
+        })
+        if (hash['email'] === '') {
             $form.find('[name="email"]').siblings('.error')
-                .text('填邮箱啊同学')
-            return
+                .text('填邮箱啊同学');
+            return;
         }
 
-        $.post('sign_in',hash)
-            .then((response)=>{
-                    window.location.href = '/'
+        $.post('sign_in', hash)
+            .then((response) => {
+                    window.location.href = '/'; //登录成功，跳到首页
                 },
-                (request)=>{
-                    alert('登录失败')
+                (request) => {
+                    alert('登录失败');
                 })
     })
 </script>

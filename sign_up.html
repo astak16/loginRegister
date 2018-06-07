@@ -7,25 +7,33 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>注册</title>
     <style>
-        *{margin:0;padding:0;box-sizing: border-box}
-        body{
-            border:1px solid red;
-            min-height:100vh;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            border: 1px solid red;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
-        .form-wrapper{
-            padding:20px;
-            border:1px solid grey;
+
+        .form-wrapper {
+            padding: 20px;
+            border: 1px solid grey;
         }
-        .form-wrapper .row{
-            margin:10px 0;
+
+        .form-wrapper .row {
+            margin: 10px 0;
         }
-        .form-wrapper .row>label{
+
+        .form-wrapper .row > label {
             display: inline-block;
-            min-width:4em;
+            min-width: 4em;
         }
     </style>
 </head>
@@ -56,36 +64,49 @@
 
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script>
-    let $form = $('#signUpForm')
-    $form.on('submit',(e) => {
-        e.preventDefault()
-        let hash = {}
-        let need = ['email','password','password_confirmation']
+    let $form = $('#signUpForm');
+
+    $form.on('submit', (e) => {
+        e.preventDefault();  //阻止默认事件
+
+        //获取用户填写的表单信息
+        let hash = {};
+        let need = ['email', 'password', 'password_confirmation'];
         need.forEach((name) => {
-            let value = $form.find(`[name=${name}]`).val()
-            hash[name] = value
-        })
+            // hash['password'] = $('signUpForm').find(`name="password"`).val()
+            // hash['email'] = $('signUpForm').find(`name="email"`).val()
+            // hash['password_confirmation'] = $('signUpForm').find(`name="password_confirmation"`).val()
+
+            let value = $form.find(`[name=${name}]`).val();       //find 接选择器，[name=${name}]意思是找到 name = name的值的选择器，val 是找到对应选择器的值，等价与上面三行
+            hash[name] = value;
+        });
+
         //前端验证
-        $form.find('.error').each((index,span)=>{$(span).text('')})
-        if(hash['email'] === ''){
+        $form.find('.error').each((index, span) => {
+            $(span).text('');
+        });
+        if (hash['email'] === '') {
             $form.find('[name="email"]').siblings('.error')
-                .text('填邮箱啊同学')
-            return
+                .text('填邮箱啊同学');
+            return;
         }
 
-        $.post('sign_up',hash)
-            .then((response)=>{},
-                (request)=>{
-                    let {errors} = request.responseJSON  //等价下面一行
-//                    let {errors}= JSON.parse(request.responseText)
+        //登录提示
+        $.post('sign_up', hash)
+            .then((response) => {},     //登录成功，提示
+                (request) => {      //登录失败提示
+                    let {errors} = request.responseJSON;  //responseJSON 是 jQuery API，等价下面两行，解析符合 JSON 格式的字符串变成对象
+                    // let object = request.responseJSON
+                    // let errors = object.errors      //等价于 let {errors} = object
 
-                    if(errors.email && errors.email === 'invalid'){
+                    // let {errors}= JSON.parse(request.responseText)   //JSON.parse 是浏览器提供的 API
+
+                    //错误提示
+                    if (errors.email && errors.email === 'invalid') {
                         $form.find('[name="email"]').siblings('.error')
-                            .text('邮箱格式错误')
+                            .text('邮箱格式错误');
                     }
-
-
-            })
+                })
     })
 </script>
 </body>
